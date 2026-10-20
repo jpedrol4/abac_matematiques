@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rekenrek · Institut Escola de Batea</title>
+<style>
+:root{
+  --bg:#f7f2e8; --paper:#fffef9; --ink:#243044; --muted:#6d7582;
+  --wood:#c98a4a; --wood2:#9d642e; --red:#e65353; --white:#f9f7ef;
+  --blue:#326f9d; --green:#3d8f63; --orange:#f0a43b; --line:#e6dccb;
+  --shadow:0 14px 36px rgba(45,53,65,.14); --r:24px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:ui-rounded,"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;color:var(--ink)}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 8% 6%,rgba(240,164,59,.16) 0 8%,transparent 8.6%),
+    radial-gradient(circle at 94% 2%,rgba(61,143,99,.13) 0 10%,transparent 10.5%),
+    var(--bg);
+}
+button,select,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.app{max-width:1180px;margin:auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:62px;height:62px;border-radius:20px;background:var(--blue);color:white;display:grid;place-items:center;font-size:34px;box-shadow:var(--shadow)}
+h1{font-size:clamp(1.6rem,4vw,2.5rem);margin:0;line-height:1.05}
+.sub{margin-top:5px;color:var(--muted);font-weight:800}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:15px;padding:11px 15px;min-height:46px;background:#e9eef2;color:var(--ink);font-weight:1000}
+.btn.primary{background:var(--blue);color:white}
+.btn.green{background:var(--green);color:white}
+.btn.orange{background:var(--orange);color:#3b2a0e}
+.btn.danger{background:#f8dfdf;color:#912d2d}
+.panel{background:rgba(255,254,249,.97);border:2px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+.toolbar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.control label{display:block;font-size:.78rem;font-weight:1000;color:var(--muted);margin:0 0 5px 3px}
+select{width:100%;min-height:46px;border:2px solid #d8dde2;border-radius:14px;background:white;padding:9px;font-weight:900;color:var(--ink)}
+.scoreline{display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.scoreBox{background:#fff;border:2px solid #dce2e5;border-radius:16px;padding:9px 14px;font-weight:1000}
+.scoreBox.active{outline:4px solid #ffc35b}
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{border:3px solid #dfe5e8;border-radius:22px;background:#fff;padding:16px;min-height:145px;text-align:center;color:var(--ink);box-shadow:0 8px 18px rgba(45,53,65,.07);transition:.15s}
+.card:hover,.card:focus-visible{transform:translateY(-3px);outline:4px solid #bdd6e8}
+.card .icon{font-size:42px;display:block;margin-bottom:7px}
+.card b{display:block;font-size:1.03rem}.card small{display:block;color:var(--muted);margin-top:5px;line-height:1.35}
+.stage{display:none}.stage.show{display:block}
+.stageTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.stageTop h2{margin:0;font-size:clamp(1.25rem,3vw,1.8rem)}
+.prompt{text-align:center;font-size:clamp(1.2rem,3vw,1.7rem);font-weight:1000;margin:18px 0}
+.rekenWrap{display:grid;place-items:center;margin:10px auto 18px}
+.reken{
+  width:min(900px,100%);background:linear-gradient(#d49a5d,#b57639);
+  border:10px solid var(--wood2);border-radius:28px;padding:26px 24px;box-shadow:0 12px 0 #774718,0 18px 30px rgba(0,0,0,.16);
+}
+.row{
+  position:relative;height:88px;display:flex;align-items:center;
+  border-left:8px solid #7e4d22;border-right:8px solid #7e4d22;
+  padding:0 12px;margin:8px 0;
+}
+.rod{position:absolute;left:0;right:0;height:8px;background:#e7d4b9;border-radius:8px;box-shadow:inset 0 2px 2px rgba(0,0,0,.2)}
+.beads{position:relative;z-index:2;display:flex;gap:2px;width:100%;align-items:center}
+.bead{
+  width:clamp(30px,6.3vw,62px);height:clamp(30px,6.3vw,62px);border-radius:50%;
+  border:3px solid rgba(0,0,0,.16);box-shadow:inset -7px -5px 0 rgba(0,0,0,.12),0 3px 2px rgba(0,0,0,.13);
+  transition:.18s transform;flex:0 0 auto;
+}
+.bead.red{background:var(--red)}.bead.white{background:var(--white)}
+.bead.active{transform:translateX(0)}
+.bead.gapAfter{margin-right:auto}
+.rowLabel{position:absolute;right:-18px;top:-13px;background:#fff;border:2px solid #d9dfe3;border-radius:12px;padding:4px 8px;font-weight:1000;z-index:3}
+.numberDisplay{text-align:center;font-size:clamp(2rem,5vw,3.8rem);font-weight:1000;color:var(--blue);min-height:70px}
+.answers{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.answer{min-width:78px;min-height:62px;border:3px solid #d8e0e6;border-radius:18px;background:white;font-size:1.4rem;font-weight:1000;color:var(--ink)}
+.answer:hover{transform:translateY(-2px);border-color:var(--blue)}
+.answer.right{outline:5px solid #62aa79}.answer.wrong{opacity:.35}
+.feedback{min-height:58px;display:grid;place-items:center;text-align:center;font-size:1.15rem;font-weight:1000;margin-top:10px}
+.feedback.ok{color:#257246}.feedback.no{color:#a52f2f}
+.navrow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.teacherTools{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.numberInput{width:100px;min-height:46px;border:2px solid #ccd5da;border-radius:14px;text-align:center;font-size:1.25rem;font-weight:1000}
+.hidden{display:none!important}
+dialog{border:0;border-radius:24px;max-width:700px;width:calc(100% - 30px);padding:0;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(25,30,35,.48)}
+.modal{padding:22px}.modal h2{margin-top:0}.modal p,.modal li{line-height:1.55}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}.confetti i{position:absolute;top:-30px;animation:fall 1.1s linear forwards;font-style:normal}
+@keyframes fall{to{transform:translateY(108vh) rotate(500deg);opacity:.1}}
+.footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:10px}
+@media(max-width:800px){.toolbar{grid-template-columns:repeat(2,1fr)}.menu{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.app{padding:9px}.panel{padding:12px}.toolbar{grid-template-columns:1fr 1fr}.menu{grid-template-columns:1fr}.reken{padding:18px 8px;border-width:7px}.row{height:66px;padding:0 4px}.bead{border-width:2px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <div class="logo">🧮</div>
+    <div><h1>Rekenrek</h1><div class="sub">Institut Escola de Batea · Cicle inicial</div></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="homeBtn">🏠 Inici</button>
+    <button class="btn" id="helpBtn">❔ Ajuda</button>
+    <button class="btn" id="soundBtn">🔊 So</button>
+    <button class="btn danger" id="resetBtn">↻ Reinicia</button>
+  </div>
+</header>
+
+<section class="toolbar">
+  <div class="control"><label for="range">REKENREK</label><select id="range"><option value="10">Fins a 10</option><option value="20" selected>Fins a 20</option></select></div>
+  <div class="control"><label for="level">NIVELL</label><select id="level"><option value="1">1r · inicial</option><option value="2">2n · avançat</option></select></div>
+  <div class="control"><label for="play">MODE DE JOC</label><select id="play"><option value="solo">Classe / individual</option><option value="teams">2 equips</option></select></div>
+  <div class="control"><label for="labels">NOMBRES VISIBLES</label><select id="labels"><option value="yes">Sí</option><option value="no">No</option></select></div>
+</section>
+
+<section class="scoreline">
+  <div class="scoreBox active" id="team0">🔵 Equip Blau: <span id="s0">0</span></div>
+  <div class="scoreBox" id="team1">🟠 Equip Taronja: <span id="s1">0</span></div>
+  <div class="scoreBox">⭐ Encerts: <span id="stars">0</span></div>
+</section>
+
+<main>
+<section class="panel" id="home">
+  <h2 style="text-align:center;margin-top:0">Tria una activitat</h2>
+  <div class="menu">
+    <button class="card" data-game="free"><span class="icon">👩‍🏫</span><b>Rekenrek lliure</b><small>Eina de demostració per al docent.</small></button>
+    <button class="card" data-game="make"><span class="icon">🔢</span><b>Fes aquest nombre</b><small>Mou les boles per representar una quantitat.</small></button>
+    <button class="card" data-game="see"><span class="icon">👀</span><b>Quants en veus?</b><small>Subitització i reconeixement ràpid.</small></button>
+    <button class="card" data-game="ten"><span class="icon">🖐️</span><b>Complements</b><small>Quants en falten per arribar a 5, 10 o 20?</small></button>
+    <button class="card" data-game="calc"><span class="icon">➕</span><b>Sumes i restes</b><small>Construeix i resol operacions amb el rekenrek.</small></button>
+    <button class="card" data-game="teams"><span class="icon">🏁</span><b>Repte per equips</b><small>Preguntes ràpides amb puntuació.</small></button>
+  </div>
+</section>
+
+<section class="panel stage" id="stage">
+  <div class="stageTop">
+    <button class="btn" id="backBtn">← Activitats</button>
+    <h2 id="title"></h2>
+    <div class="scoreBox" id="counter">Repte 1</div>
+  </div>
+  <div class="prompt" id="prompt"></div>
+  <div class="numberDisplay" id="numberDisplay"></div>
+  <div class="rekenWrap">
+    <div class="reken" id="reken"></div>
+  </div>
+  <div class="answers" id="answers"></div>
+  <div class="teacherTools hidden" id="teacherTools">
+    <input class="numberInput" id="teacherNum" type="number" min="0" max="20" value="7">
+    <button class="btn primary" id="showNumBtn">Mostra el nombre</button>
+    <button class="btn" id="clearBtn">Posa a zero</button>
+    <button class="btn orange" id="randomBtn">Nombre sorpresa</button>
+  </div>
+  <div class="feedback" id="feedback" aria-live="assertive"></div>
+  <div class="navrow">
+    <button class="btn orange" id="hintBtn">💡 Pista</button>
+    <button class="btn green hidden" id="checkBtn">✓ Comprova</button>
+    <button class="btn primary" id="nextBtn">Següent ▶</button>
+  </div>
+</section>
+</main>
+
+<div class="footer">Aplicació educativa local · Sense comptes, anuncis ni recollida de dades</div>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<dialog id="help">
+<div class="modal">
+<h2>Com treballar amb el rekenrek?</h2>
+<p>El rekenrek ajuda a veure els nombres en grups de 5 i 10, evitant dependre del recompte d'una en una.</p>
+<ul>
+<li><b>Rekenrek lliure:</b> el docent mostra nombres i pregunta “Com ho has vist?”.</li>
+<li><b>Fes aquest nombre:</b> l'alumnat representa una quantitat amb les boles.</li>
+<li><b>Quants en veus?:</b> reconeixement visual ràpid.</li>
+<li><b>Complements:</b> treball de 5, 10 i 20 com a nombres de referència.</li>
+<li><b>Sumes i restes:</b> ús del material per explicar estratègies.</li>
+<li><b>Repte per equips:</b> joc oral de classe amb puntuació.</li>
+</ul>
+<p><b>Pregunta clau:</b> “Ho pots veure sense comptar d'una en una?”</p>
+<button class="btn primary" onclick="document.getElementById('help').close()">Entesos!</button>
+</div>
+</dialog>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const E={home:$("home"),stage:$("stage"),range:$("range"),level:$("level"),play:$("play"),labels:$("labels"),
+team0:$("team0"),team1:$("team1"),s0:$("s0"),s1:$("s1"),stars:$("stars"),title:$("title"),counter:$("counter"),
+prompt:$("prompt"),display:$("numberDisplay"),reken:$("reken"),answers:$("answers"),teacherTools:$("teacherTools"),
+teacherNum:$("teacherNum"),showNumBtn:$("showNumBtn"),clearBtn:$("clearBtn"),randomBtn:$("randomBtn"),
+feedback:$("feedback"),hintBtn:$("hintBtn"),checkBtn:$("checkBtn"),nextBtn:$("nextBtn"),backBtn:$("backBtn"),
+homeBtn:$("homeBtn"),helpBtn:$("helpBtn"),soundBtn:$("soundBtn"),resetBtn:$("resetBtn"),help:$("help"),confetti:$("confetti")};
+
+let S={game:null,active:[0,0],target:0,correct:null,score:[0,0],turn:0,stars:0,q:1,locked:false,sound:true,hint:""};
+
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i;i--){let j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const maxN=()=>+E.range.value;
+
+function beep(ok){
+ if(!S.sound)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+ const c=new AC(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=ok?680:220;
+ g.gain.setValueAtTime(.10,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.2);o.start();o.stop(c.currentTime+.21);
+}
+function celebrate(){
+ ["⭐","●","✨","🔢"].forEach(x=>{for(let i=0;i<3;i++){let n=document.createElement("i");n.textContent=x;n.style.left=rnd(5,95)+"vw";n.style.fontSize=rnd(18,30)+"px";n.style.animationDelay=Math.random()*.2+"s";E.confetti.appendChild(n);setTimeout(()=>n.remove(),1400)}})
+}
+function updateScore(){
+ E.s0.textContent=S.score[0];E.s1.textContent=S.score[1];E.stars.textContent=S.stars;
+ E.team0.classList.toggle("active",S.turn===0);E.team1.classList.toggle("active",S.turn===1);
+ let teams=E.play.value==="teams"||S.game==="teams";E.team0.classList.toggle("hidden",!teams);E.team1.classList.toggle("hidden",!teams);
+}
+function render(){
+ E.reken.innerHTML="";
+ let rows=maxN()===10?1:2;
+ for(let r=0;r<rows;r++){
+   let row=document.createElement("div");row.className="row";
+   let rod=document.createElement("div");rod.className="rod";row.appendChild(rod);
+   let beads=document.createElement("div");beads.className="beads";
+   for(let i=0;i<10;i++){
+     let b=document.createElement("button");b.className="bead "+(i<5?"red":"white");
+     b.setAttribute("aria-label",`Bola ${i+1} de la fila ${r+1}`);
+     if(i===S.active[r]-1)b.classList.add("gapAfter");
+     b.onclick=()=>{if(S.locked&&S.game!=="free")return;S.active[r]=i+1;render();if(["make","calc"].includes(S.game))E.display.textContent=`${S.active.reduce((a,b)=>a+b,0)}`};
+     beads.appendChild(b);
+   }
+   if(S.active[r]===0){beads.firstElementChild.style.marginLeft="auto"}
+   row.appendChild(beads);
+   if(E.labels.value==="yes"){
+     let lab=document.createElement("div");lab.className="rowLabel";lab.textContent=S.active[r];row.appendChild(lab);
+   }
+   E.reken.appendChild(row);
+ }
+}
+function setNumber(n){
+ if(maxN()===10){S.active=[Math.min(10,n),0]}
+ else{S.active=[Math.min(10,n),Math.max(0,n-10)]}
+ render();
+}
+function current(){return S.active[0]+S.active[1]}
+function feedback(txt,ok=null){E.feedback.textContent=txt;E.feedback.className="feedback"+(ok===true?" ok":ok===false?" no":"")}
+function opts(correct,max){
+ let s=new Set([correct]);while(s.size<4){let n=Math.max(0,Math.min(max,correct+rnd(-4,4)));s.add(n)}return [...s]
+}
+function answerButtons(vals){
+ E.answers.innerHTML="";shuffle(vals).forEach(v=>{let b=document.createElement("button");b.className="answer";b.textContent=v;b.onclick=()=>checkAnswer(v,b);E.answers.appendChild(b)})
+}
+function checkAnswer(v,b){
+ if(S.locked)return;
+ let ok=v===S.correct;
+ if(ok){S.locked=true;S.stars++;if(E.play.value==="teams"||S.game==="teams")S.score[S.turn]++;b.classList.add("right");beep(true);celebrate();feedback("Molt bé! Has vist el nombre amb rapidesa. ⭐",true);updateScore();}
+ else{b.classList.add("wrong");beep(false);feedback("Mira els grups de 5 i 10 i torna-ho a provar.",false)}
+}
+function base(title){
+ S.locked=false;E.title.textContent=title;E.counter.textContent=`Repte ${S.q}`;E.answers.innerHTML="";E.teacherTools.classList.add("hidden");E.checkBtn.classList.add("hidden");E.nextBtn.classList.remove("hidden");feedback("");E.display.textContent="";
+}
+function free(){
+ base("👩‍🏫 Rekenrek lliure");E.prompt.textContent="Mou les boles o tria un nombre per mostrar-lo a la classe.";E.teacherTools.classList.remove("hidden");E.nextBtn.classList.add("hidden");S.active=[0,0];S.hint="Pregunta: «Com has vist el nombre? Has utilitzat el 5 o el 10?»";render();
+}
+function make(){
+ base("🔢 Fes aquest nombre");let n=rnd(1,maxN());S.target=n;S.active=[0,0];E.prompt.textContent=`Representa el nombre ${n} amb el rekenrek.`;E.display.textContent=n;E.checkBtn.classList.remove("hidden");S.hint=n<=5?"Pensa quantes boles necessites de les cinc primeres.":n<=10?`Pensa ${n} com 5 + ${n-5}.`:`Pensa ${n} com 10 + ${n-10}.`;render();
+}
+function see(){
+ base("👀 Quants en veus?");let n=rnd(1,maxN());setNumber(n);S.correct=n;E.prompt.textContent="Quantes boles hi ha desplaçades?";S.hint="No les comptis d'una en una. Busca grups de 5 o 10.";answerButtons(opts(n,maxN()));
+}
+function complement(){
+ base("🖐️ Complements");let goal=maxN()===20&&Math.random()<.45?20:(Math.random()<.5?10:5);if(goal>maxN())goal=maxN();
+ let n=rnd(0,goal-1);setNumber(n);S.correct=goal-n;E.prompt.textContent=`Quantes boles falten per arribar a ${goal}?`;E.display.textContent=`${n} + ? = ${goal}`;S.hint=`Compta des de ${n} fins a ${goal}, o pensa quin tros falta per completar el grup.`;answerButtons(opts(S.correct,goal));
+}
+function calc(){
+ base("➕ Sumes i restes");let max=maxN(),a,b,op;
+ if(E.level.value==="1"){op=Math.random()<.6?"+":"-"}else{op=Math.random()<.5?"+":"-"}
+ if(op==="+"){a=rnd(1,max-2);b=rnd(1,Math.min(max-a,E.level.value==="1"?5:10));S.correct=a+b;setNumber(a);E.prompt.textContent=`Comença per ${a}. Mou boles per sumar ${b}. Quin resultat obtens?`;E.display.textContent=`${a} + ${b} = ?`;S.target=S.correct;}
+ else{a=rnd(3,max);b=rnd(1,Math.min(a,E.level.value==="1"?5:10));S.correct=a-b;setNumber(a);E.prompt.textContent=`Comença per ${a}. Treu ${b}. Quin resultat queda?`;E.display.textContent=`${a} − ${b} = ?`;S.target=S.correct;}
+ E.checkBtn.classList.remove("hidden");S.hint="Utilitza 5 i 10 com a nombres de referència. No cal moure les boles una per una.";render();
+}
+function teams(){
+ base("🏁 Repte per equips");let type=rnd(0,2),max=maxN();
+ if(type===0){let n=rnd(1,max);setNumber(n);S.correct=n;E.prompt.textContent="Quantes boles veus?";S.hint="Busca primer 5 o 10.";answerButtons(opts(n,max));}
+ else if(type===1){let goal=max===20?20:10,n=rnd(0,goal-1);setNumber(n);S.correct=goal-n;E.prompt.textContent=`Quantes en falten per arribar a ${goal}?`;S.hint=`De ${n} fins a ${goal}.`;answerButtons(opts(S.correct,goal));}
+ else{let a=rnd(1,max-2),b=rnd(1,Math.min(6,max-a));setNumber(a);S.correct=a+b;E.prompt.textContent=`Si hi afegim ${b}, quantes n'hi haurà?`;E.display.textContent=`${a} + ${b}`;S.hint="Pots arribar primer al 5 o al 10.";answerButtons(opts(S.correct,max));}
+}
+function generate(){({free,make,see,ten:complement,calc,teams}[S.game])()}
+function start(g){S.game=g;S.q=1;E.home.classList.add("hidden");E.stage.classList.add("show");generate();updateScore()}
+function next(){S.q++;if(E.play.value==="teams"||S.game==="teams")S.turn=1-S.turn;generate();updateScore()}
+function home(){S.game=null;E.stage.classList.remove("show");E.home.classList.remove("hidden");updateScore()}
+function reset(){S.score=[0,0];S.turn=0;S.stars=0;S.q=1;S.active=[0,0];updateScore();if(S.game)generate()}
+document.querySelectorAll(".card").forEach(b=>b.onclick=()=>start(b.dataset.game));
+E.nextBtn.onclick=next;E.backBtn.onclick=home;E.homeBtn.onclick=home;E.helpBtn.onclick=()=>E.help.showModal();
+E.hintBtn.onclick=()=>feedback(S.hint,null);
+E.checkBtn.onclick=()=>{if(S.locked)return;let ok=current()===S.target;if(ok){S.locked=true;S.stars++;if(E.play.value==="teams")S.score[S.turn]++;beep(true);celebrate();feedback("Correcte! Bona representació. ⭐",true);updateScore()}else{beep(false);feedback(`Ara tens ${current()}. Revisa què et falta o què et sobra.`,false)}};
+E.showNumBtn.onclick=()=>{let n=Math.max(0,Math.min(maxN(),+E.teacherNum.value||0));E.teacherNum.value=n;setNumber(n);E.display.textContent=n};
+E.clearBtn.onclick=()=>{setNumber(0);E.display.textContent="0"};E.randomBtn.onclick=()=>{let n=rnd(1,maxN());E.teacherNum.value=n;setNumber(n);E.display.textContent=n};
+E.soundBtn.onclick=()=>{S.sound=!S.sound;E.soundBtn.textContent=S.sound?"🔊 So":"🔇 So"};
+E.resetBtn.onclick=reset;E.play.onchange=updateScore;
+E.range.onchange=()=>{E.teacherNum.max=maxN();if(S.game)generate()};E.level.onchange=()=>{if(S.game)generate()};E.labels.onchange=render;
+render();updateScore();
+})();
+</script>
+</body>
+</html>
